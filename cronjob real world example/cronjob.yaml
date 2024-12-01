@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-log-cleanup
+  namespace: default
+spec:
+  schedule: '*/1 * * * *'
+  jobTemplate:
+    metadata:
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - args:
+            - echo "$(date) - Deleting the logs every 1 minute" && find /var/log/nginx -type f -name 'access.log' -exec truncate -s 0 {} \;
+            command:
+            - sh
+            - -c
+            image: busybox:latest
+            imagePullPolicy: IfNotPresent
+            name: log-cleanup
+            volumeMounts:
+            - mountPath: /var/log/nginx
+              name: log-volume
+          restartPolicy: OnFailure
+          volumes:
+          - name: log-volume
+            persistentVolumeClaim:
+              claimName: log-pvc

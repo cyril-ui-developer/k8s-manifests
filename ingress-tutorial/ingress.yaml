@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: carolina-ingress
+  namespace: carolina-ns
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: carolina.ingress.com
+    http:
+      paths:
+      - path: /cary
+        pathType: Prefix
+        backend:
+          service:
+            name: cary-svc
+            port:
+              number: 80
+      - path: /apex
+        pathType: Prefix
+        backend:
+          service:
+            name: apex-svc
+            port:
+              number: 80
+
